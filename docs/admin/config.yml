@@ -6,19 +6,18 @@ backend:
 
 site_url: https://jomayeux.incongru.org
 
-publish_mode: editorial_workflow
 media_folder: assets/uploads
 
 collections: # A list of collections the CMS should be able to edit
   - name: 'episodes' # Used in routes, ie.: /admin/collections/:slug/edit
     label: 'Episodes' # Used in the UI
-    label_singular: 'Episonde' # Used in the UI, ie: "New Post"
-    folder: '_episodes'
+    label_singular: 'Episode' # Used in the UI, ie: "New Post"
+    folder: 'episodes' # The folder where documents are stored
     slug: '{{slug}}'
-    summary: '{{title}} -- {{year}}/{{month}}/{{day}}'
+    summary: '{{number}}'
     create: true # Allow users to create new documents in this collection
     sortable_fields:
-      - title
+      - number
     view_groups:
       - label: Year
         field: date
@@ -26,7 +25,7 @@ collections: # A list of collections the CMS should be able to edit
       - label: Drafts
         field: draft
     fields: # The fields each document in this collection have
-      - { label: 'Title', name: 'title', widget: 'number', tagname: 'h1' }
+      - { label: 'Number', name: 'number', widget: 'number', hint: 'Episode number, e.g., 42' }
       - { label: 'Draft', name: 'draft', widget: 'boolean', default: true }
       - {
           label: 'Publish Date',
@@ -39,5 +38,10 @@ collections: # A list of collections the CMS should be able to edit
         name: 'image'
         widget: 'image'
         required: false
-      - { label: 'Body', name: 'body', widget: 'markdown', hint: 'Main content goes here.' }
+
+      - label: 'Body'
+        name: 'body'
+        widget: 'markdown'
+        required: false
+        hint: 'Main content goes here.'
 
