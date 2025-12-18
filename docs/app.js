@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Charger les données de la newsletter
 async function loadNewsletter() {
     try {
-        const jsonFiles = ['execution-8861.json'];
+        const jsonFiles = ['latest.json'];
         
         let data = null;
         let lastError = null;

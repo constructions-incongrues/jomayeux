@@ -430,6 +430,7 @@ body {
 
 .contribution-description {
     font-size: 0.9rem;
+    font-weight: 400;
     /* font-style: italic; */
     /* color: var(--text-light); */
     line-height: 1.3;
