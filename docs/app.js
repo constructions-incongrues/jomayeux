@@ -15,46 +15,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Charger les données de la newsletter
 async function loadNewsletter() {
     try {
-        const jsonFiles = ['latest.json'];
+        const response = await fetch(`${EXECUTIONS_DIR}latest.json`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            },
+            mode: 'cors'
+        });
         
-        let data = null;
-        let lastError = null;
-        
-        for (const filename of jsonFiles) {
-            try {
-                const response = await fetch(`${EXECUTIONS_DIR}${filename}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                    },
-                    mode: 'cors'
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                let text = await response.text();
-                text = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
-                data = JSON.parse(text);
-                break;
-            } catch (error) {
-                // Détecter les erreurs CORS
-                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-                    const isFileProtocol = window.location.protocol === 'file:';
-                    if (isFileProtocol) {
-                        throw new Error('CORS: Veuillez utiliser un serveur HTTP local. Ouvrez un terminal dans le dossier du projet et exécutez: python3 -m http.server 8000 puis accédez à http://localhost:8000/docs/');
-                    } else {
-                        throw new Error('CORS: Erreur de chargement. Vérifiez que le serveur autorise les requêtes CORS.');
-                    }
-                }
-                lastError = error;
-                continue;
-            }
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
+        let text = await response.text();
+        text = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+        const data = JSON.parse(text);
+        
         if (!data || !data.newsletter) {
-            throw lastError || new Error('Aucun fichier JSON valide trouvé');
+            throw new Error('Aucun fichier JSON valide trouvé');
         }
         
         newsletterData = data.newsletter;
@@ -62,6 +40,16 @@ async function loadNewsletter() {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('newsletter').classList.remove('hidden');
     } catch (error) {
+        // Détecter les erreurs CORS
+        if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+            const isFileProtocol = window.location.protocol === 'file:';
+            if (isFileProtocol) {
+                throw new Error('CORS: Veuillez utiliser un serveur HTTP local. Ouvrez un terminal dans le dossier du projet et exécutez: python3 -m http.server 8000 puis accédez à http://localhost:8000/docs/');
+            } else {
+                throw new Error('CORS: Erreur de chargement. Vérifiez que le serveur autorise les requêtes CORS.');
+            }
+        }
+        
         console.error('Erreur lors du chargement:', error);
         const loadingEl = document.getElementById('loading');
         loadingEl.textContent = error.message || 'Erreur lors du chargement des données.';
@@ -102,11 +90,26 @@ function renderAgenda() {
     
     if (!agendaContainer || !template) return;
     
-    if (!newsletterData.agenda || newsletterData.agenda.length === 0) {
+    if (!newsletterData.agenda || typeof newsletterData.agenda !== 'object') {
         return;
     }
     
-    const sortedAgenda = [...newsletterData.agenda].sort((a, b) => {
+    // Convertir l'objet agenda en tableau plat avec toutes les villes
+    const allEvents = [];
+    Object.keys(newsletterData.agenda).forEach(city => {
+        const cityEvents = newsletterData.agenda[city];
+        if (Array.isArray(cityEvents)) {
+            cityEvents.forEach(event => {
+                allEvents.push({
+                    ...event,
+                    city: city
+                });
+            });
+        }
+    });
+    
+    // Trier par date
+    const sortedAgenda = allEvents.sort((a, b) => {
         return new Date(a.date) - new Date(b.date);
     });
     
@@ -120,44 +123,29 @@ function renderAgenda() {
             day: 'numeric'
         });
         
-        agendaItem.querySelector('.agenda-item-date').textContent = item.date;
+        agendaItem.querySelector('.agenda-item-date').textContent = formattedDate;
         
-        const event = item.event;
         const eventContainer = agendaItem.querySelector('.agenda-item-event');
         
-        if (event.title) {
-            eventContainer.querySelector('.event-title').textContent = event.title;
-        } else {
-            eventContainer.querySelector('.event-title').remove();
-        }
+        // event est maintenant une chaîne, pas un objet
+        const eventText = item.event || '';
+        eventContainer.querySelector('.event-title').textContent = eventText;
         
-        if (event.description) {
-            eventContainer.querySelector('.event-description').textContent = event.description;
-        } else {
-            eventContainer.querySelector('.event-description').remove();
-        }
+        // Pas de description dans la nouvelle structure
+        eventContainer.querySelector('.event-description').remove();
         
+        // Pas de lien dans la nouvelle structure
         const linkEl = eventContainer.querySelector('.event-link');
         const linkContainer = eventContainer.querySelector('.event-link-container');
-        
-        if (event.link) {
-            linkEl.textContent = event.link;
-            linkEl.href = event.link;
-            // Afficher le premier enfant (SVG) si le lien existe
-            if (linkContainer && linkContainer.firstElementChild) {
-                linkContainer.firstElementChild.style.display = '';
-            }
-        } else {
-            linkEl.textContent = '';
-            linkEl.href = '';
-            // Masquer le premier enfant (SVG) si le lien est vide
-            if (linkContainer && linkContainer.firstElementChild) {
-                linkContainer.firstElementChild.style.display = 'none';
-            }
+        linkEl.textContent = '';
+        linkEl.href = '';
+        if (linkContainer && linkContainer.firstElementChild) {
+            linkContainer.firstElementChild.style.display = 'none';
         }
         
-        if (event.location) {
-            eventContainer.querySelector('.event-location').textContent = event.location;
+        // La ville est maintenant dans item.city
+        if (item.city) {
+            eventContainer.querySelector('.event-location').textContent = item.city;
         } else {
             eventContainer.querySelector('.event-location').remove();
         }
@@ -166,7 +154,7 @@ function renderAgenda() {
     });
 }
 
-// Afficher les membres
+// Afficher les membres (trouvailles)
 function renderMembers() {
     const membersContainer = document.querySelector('#newsletter .newsletter-members');
     const memberTemplate = document.getElementById('template-member');
@@ -174,56 +162,54 @@ function renderMembers() {
     
     if (!membersContainer || !memberTemplate || !contributionTemplate) return;
     
-    if (!newsletterData.members || newsletterData.members.length === 0) {
+    // La nouvelle structure utilise "trouvailles" au lieu de "members"
+    const trouvailles = newsletterData.trouvailles || newsletterData.members;
+    
+    if (!trouvailles || typeof trouvailles !== 'object') {
         return;
     }
     
-    newsletterData.members.forEach(member => {
+    // Convertir l'objet trouvailles en tableau
+    Object.keys(trouvailles).forEach(memberName => {
         const memberCard = memberTemplate.content.cloneNode(true);
-        memberCard.querySelector('.member-name').textContent = member.name;
+        memberCard.querySelector('.member-name').textContent = memberName;
         
         const contributionsContainer = memberCard.querySelector('.member-contributions');
+        const contributions = trouvailles[memberName];
         
-        member.contributions.forEach(contribution => {
-            const contributionCard = contributionTemplate.content.cloneNode(true);
-            
-            if (contribution.type) {
-                contributionCard.querySelector('.contribution-type').textContent = contribution.type;
-            } else {
+        if (Array.isArray(contributions)) {
+            contributions.forEach(contribution => {
+                const contributionCard = contributionTemplate.content.cloneNode(true);
+                
+                // Pas de type dans la nouvelle structure
                 contributionCard.querySelector('.contribution-type').remove();
-            }
-            
-            if (contribution.title) {
-                contributionCard.querySelector('.contribution-title').textContent = contribution.title;
-            } else {
-                contributionCard.querySelector('.contribution-title').remove();
-            }
-            
-            if (contribution.description) {
-                contributionCard.querySelector('.contribution-description').textContent = contribution.description;
-            } else {
+                
+                if (contribution.title) {
+                    contributionCard.querySelector('.contribution-title').textContent = contribution.title;
+                } else {
+                    contributionCard.querySelector('.contribution-title').remove();
+                }
+                
+                // Pas de description dans la nouvelle structure
                 contributionCard.querySelector('.contribution-description').remove();
-            }
-            
-            if (contribution.link) {
-                const linkEl = contributionCard.querySelector('.contribution-link');
-                linkEl.href = contribution.link;
-                linkEl.target = '_blank';
-                linkEl.rel = 'noopener';
-                // Insérer le SVG au lieu du texte (avec couleur primaire)
-                linkEl.innerHTML = `<svg width="24px" height="24px" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" color="#f51e9fcd"><path d="M21 3L15 3M21 3L12 12M21 3V9" stroke="#f51e9f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M21 13V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H11" stroke="#f51e9f" stroke-width="1.5" stroke-linecap="round"></path></svg>`;
-            } else {
-                contributionCard.querySelector('.contribution-link').remove();
-            }
-            
-            if (contribution.location) {
-                contributionCard.querySelector('.contribution-location').textContent = contribution.location;
-            } else {
+                
+                if (contribution.link) {
+                    const linkEl = contributionCard.querySelector('.contribution-link');
+                    linkEl.href = contribution.link;
+                    linkEl.target = '_blank';
+                    linkEl.rel = 'noopener';
+                    // Insérer le SVG au lieu du texte (avec couleur primaire)
+                    linkEl.innerHTML = `<svg width="24px" height="24px" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" color="#f51e9fcd"><path d="M21 3L15 3M21 3L12 12M21 3V9" stroke="#f51e9f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M21 13V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H11" stroke="#f51e9f" stroke-width="1.5" stroke-linecap="round"></path></svg>`;
+                } else {
+                    contributionCard.querySelector('.contribution-link').remove();
+                }
+                
+                // Pas de location dans la nouvelle structure
                 contributionCard.querySelector('.contribution-location').remove();
-            }
-            
-            contributionsContainer.appendChild(contributionCard);
-        });
+                
+                contributionsContainer.appendChild(contributionCard);
+            });
+        }
         
         membersContainer.appendChild(memberCard);
     });
