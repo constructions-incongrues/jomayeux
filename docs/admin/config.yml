@@ -3,6 +3,7 @@
 backend:
   name: github
   repo: constructions-incongrues/jomayeux
+  base_url: https://jomayeux-cms-auth.constructions-incongrues.workers.dev
 
 site_url: https://jomayeux.incongru.org
 
