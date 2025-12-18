@@ -320,7 +320,7 @@ body {
 
 .newsletter-members {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
 }
 
@@ -531,6 +531,10 @@ footer p {
 
     .section {
         padding: 1.5rem;
+    }
+
+    .newsletter-members {
+        grid-template-columns: 1fr;
     }
 
     .member-contributions {
