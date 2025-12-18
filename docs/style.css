@@ -168,7 +168,7 @@ body {
 .agenda-item {
     background: var(--bg-section);
     border-top: 1px solid var(--primary-color); 
-    padding: 1rem;  
+    /* padding: 1rem;   */
 }
 
 .agenda-item-date {
