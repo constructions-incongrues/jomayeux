@@ -1,6 +1,6 @@
 /* Variables CSS */
 :root {
-    --primary-color: #e279e1cd;
+    --primary-color: #f51e9fcd;
     --text-color: #333;
     --text-light: #666;
     --bg-color: #ffffff;
@@ -16,12 +16,12 @@
 
 @font-face {
     font-family: 'Nexa';
-    src: url('static/fonts/Nexa-Bold.otf') format('opentype');
+    src: url('static/fonts/NexaBlack.otf') format('opentype');
     font-weight: 400;
 }
 @font-face {
     font-family: 'Nexa';
-    src: url('static/fonts/Nexa-Bold.otf') format('opentype');
+    src: url('static/fonts/NexaHeavy.otf') format('opentype');
     font-weight: 700;
 }
 
@@ -153,10 +153,14 @@ body {
 }
 
 .event-title {
-    font-size: 1.25rem;
+    font-size: 1.6rem;
+    line-height: 1;
     font-weight: 600;
     margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    font-style: italic;
     color: var(--primary-color);
+    font-family: 'Nexa', sans-serif;
 }
 
 .event-description {
