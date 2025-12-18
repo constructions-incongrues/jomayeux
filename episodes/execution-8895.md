@@ -2,6 +2,7 @@
 number: 1
 draft: true
 date: 2025-12-18 11:43:29
+image: /assets/uploads/131125_cdp.jpg
 cover_image: null
 ---
 # Newsletter Hebdomadaire - 2025-12-18
