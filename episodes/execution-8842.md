@@ -1,6 +1,6 @@
 ---
 number: 1
-draft: true
+draft: false
 date: 2025-12-18 08:38:12
 image: /assets/uploads/131125_cdp.jpg
 ---
