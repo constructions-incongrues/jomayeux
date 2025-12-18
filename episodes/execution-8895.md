@@ -1,4 +1,5 @@
 ---
+number: 1
 draft: true
 date: 2025-12-18 11:43:29
 cover_image:
