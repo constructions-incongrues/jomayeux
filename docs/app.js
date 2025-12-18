@@ -1,5 +1,5 @@
 // Configuration
-const EXECUTIONS_DIR = '../executions/';
+const EXECUTIONS_DIR = 'executions';
 
 // État de l'application
 let newsletterData = null;
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Charger les données de la newsletter
 async function loadNewsletter() {
     try {
-        const response = await fetch(`../executions/latest.json`, {
+        const response = await fetch(`${EXECUTIONS_DIR}/latest.json`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
