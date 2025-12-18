@@ -117,7 +117,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 1.5rem;
 }
@@ -320,7 +320,7 @@ body {
 
 .newsletter-members {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: 2rem;
 }
 
@@ -354,6 +354,10 @@ body {
     gap: 1rem;
 }
 
+.member:nth-child(even) {
+    border-left: 1px solid var(--primary-color);
+}
+
 .member-card {
     background: var(--bg-section);
     border-radius: var(--border-radius);
@@ -376,7 +380,7 @@ body {
 .member-contributions {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
+    gap: 2rem;
     margin-top: 1rem;
 }
 
@@ -435,7 +439,6 @@ body {
 
 .contribution-location {
     font-size: 0.85rem;
-    color: var(--text-light);
     margin-bottom: 0.5rem;
     display: flex;
     align-items: center;
