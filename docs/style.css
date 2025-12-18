@@ -1,6 +1,6 @@
 /* Variables CSS */
 :root {
-    --primary-color: #f51e9fcd;
+    --primary-color: rgba(245, 30, 159, 0.804);
     --text-color: #333;
     --text-light: #666;
     --bg-color: #ffffff;
@@ -168,7 +168,7 @@ body {
 .agenda-item {
     background: var(--bg-section);
     border-top: 1px solid var(--primary-color); 
-    /* padding: 1.5rem; */  
+    padding: 1rem;  
 }
 
 .agenda-item-date {
@@ -197,13 +197,11 @@ body {
 }
 
 .event-title {
-    font-size: 1.6rem;
-    line-height: 1;
+    font-size: 1.3rem;
+    line-height: 1.1;
     font-weight: 600;
     max-width: 80%;
     margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    font-style: italic;
     color: var(--primary-color);
     font-family: 'Nexa', sans-serif;
     margin-left: 30px;
@@ -237,7 +235,7 @@ body {
     font-size: 0.9rem;
     margin-bottom: 0.75rem;
     line-height: 1.6;
-    width:100%;
+    width:80%;
 }
 
 .picto {
@@ -319,6 +317,23 @@ body {
 }
 
 /* Members */
+
+.newsletter-members-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    margin-top: 3rem;
+    gap: 0.5rem;
+}
+
+.fanion {
+    width: fit-content;
+    height: 35px;
+    /* width: 100px;
+    height: 30px;
+    background: var(--primary-color); */
+}
+
 .members {
     display: flex;
     flex-direction: column;
@@ -405,7 +420,7 @@ body {
 
 .contribution-description {
     font-size: 0.9rem;
-    font-style: italic;
+    /* font-style: italic; */
     /* color: var(--text-light); */
     line-height: 1.3;
     margin-left: 1rem;
@@ -424,12 +439,7 @@ body {
 .contribution-link {
     color: var(--secondary-color);
     text-decoration: none;
-    font-size: 0.9rem;
-    display: inline-flex;
-    align-items: center;
-    overflow: hidden;
-    gap: 0.5rem;
-    transition: var(--transition);
+    float: right;
 }
 
 .contribution-link:hover {
