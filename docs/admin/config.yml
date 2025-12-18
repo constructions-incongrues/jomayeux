@@ -1,7 +1,8 @@
 # yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
 
 backend:
-  name: test-repo
+  name: github
+  repo: constructions-incongrues/jomayeux
 
 site_url: https://jomayeux.incongru.org
 
