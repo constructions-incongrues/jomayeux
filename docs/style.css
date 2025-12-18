@@ -1,6 +1,6 @@
 /* Variables CSS */
 :root {
-    --primary-color: #f51e9fcd;
+    --primary-color: rgba(245, 30, 159, 0.804);
     --text-color: #333;
     --text-light: #666;
     --bg-color: #ffffff;
@@ -60,9 +60,9 @@ body {
     z-index: -1;
     /* Background image and color blend */
     background: 
-        linear-gradient(90deg,rgba(245, 30, 159, 1) 0%, rgba(255, 255, 255, 0) 91%),
+        /* linear-gradient(90deg,rgba(245, 30, 159, 1) 0%, rgba(255, 255, 255, 0) 91%); */
         /* url('static/images/texture.jpg'); */
-    background-size: cover, 60%;
+    background-size: cover;
     background-position: center;
     background-repeat: repeat;
     /* Make color overlay blend with image */
@@ -160,7 +160,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    border:1px solid var(--primary-color);
+    /* border:1px solid var(--primary-color); */
     padding: 2rem;
 
 }
@@ -184,13 +184,23 @@ body {
     margin-bottom: 1rem;
 }
 
-.event-date {
+.event-link {
+    text-decoration: none;
+    color: var(--primary-color);
+}
+
+.event-title-container {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.5rem;
 }
 
 .event-title {
     font-size: 1.6rem;
     line-height: 1;
     font-weight: 600;
+    max-width: 80%;
     margin-bottom: 0.5rem;
     text-transform: uppercase;
     font-style: italic;
@@ -198,6 +208,21 @@ body {
     font-family: 'Nexa', sans-serif;
     margin-left: 30px;
 
+}
+
+.event-link-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
+}
+.event-link-container svg{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    padding: 0.3rem;
+    color: var(--primary-color);
+    background: var(--primary-color);
 }
 
 .event-description-container {
@@ -255,12 +280,13 @@ body {
 
 .event-location {
     font-size: 0.9rem;
-    margin-bottom: 0.75rem;
     border:1px solid var(--primary-color);
     width: fit-content;
     padding: 0.1rem 1rem;
     border-radius: 30px;
     line-height: 1.6;
+    position: relative;
+    top:-3px;
 }
 
 

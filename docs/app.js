@@ -1,5 +1,5 @@
 // Configuration
-const EXECUTIONS_DIR = 'executions/';
+const EXECUTIONS_DIR = '../executions/';
 
 // État de l'application
 let newsletterData = null;
@@ -22,14 +22,32 @@ async function loadNewsletter() {
         
         for (const filename of jsonFiles) {
             try {
-                const response = await fetch(`${EXECUTIONS_DIR}${filename}`);
-                if (!response.ok) continue;
+                const response = await fetch(`${EXECUTIONS_DIR}${filename}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
                 
                 let text = await response.text();
                 text = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
                 data = JSON.parse(text);
                 break;
             } catch (error) {
+                // Détecter les erreurs CORS
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    const isFileProtocol = window.location.protocol === 'file:';
+                    if (isFileProtocol) {
+                        throw new Error('CORS: Veuillez utiliser un serveur HTTP local. Ouvrez un terminal dans le dossier du projet et exécutez: python3 -m http.server 8000 puis accédez à http://localhost:8000/docs/');
+                    } else {
+                        throw new Error('CORS: Erreur de chargement. Vérifiez que le serveur autorise les requêtes CORS.');
+                    }
+                }
                 lastError = error;
                 continue;
             }
@@ -45,7 +63,11 @@ async function loadNewsletter() {
         document.getElementById('newsletter').classList.remove('hidden');
     } catch (error) {
         console.error('Erreur lors du chargement:', error);
-        document.getElementById('loading').textContent = 'Erreur lors du chargement des données.';
+        const loadingEl = document.getElementById('loading');
+        loadingEl.textContent = error.message || 'Erreur lors du chargement des données.';
+        loadingEl.style.color = '#e74c3c';
+        loadingEl.style.padding = '2rem';
+        loadingEl.style.whiteSpace = 'pre-line';
     }
 }
 
@@ -115,12 +137,23 @@ function renderAgenda() {
             eventContainer.querySelector('.event-description').remove();
         }
         
+        const linkEl = eventContainer.querySelector('.event-link');
+        const linkContainer = eventContainer.querySelector('.event-link-container');
+        
         if (event.link) {
-            const linkEl = eventContainer.querySelector('.event-link');
             linkEl.textContent = event.link;
             linkEl.href = event.link;
+            // Afficher le premier enfant (SVG) si le lien existe
+            if (linkContainer && linkContainer.firstElementChild) {
+                linkContainer.firstElementChild.style.display = '';
+            }
         } else {
-            eventContainer.querySelector('.event-link').remove();
+            linkEl.textContent = '';
+            linkEl.href = '';
+            // Masquer le premier enfant (SVG) si le lien est vide
+            if (linkContainer && linkContainer.firstElementChild) {
+                linkContainer.firstElementChild.style.display = 'none';
+            }
         }
         
         if (event.location) {
